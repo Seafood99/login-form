@@ -1,18 +1,31 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 
 export default function LoginForm() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
-  const Navigate = useNavigate()
+  const navigate = useNavigate()
+
+  // Fungsi untuk mendapatkan token dari localStorage
+  function getTokenLocalStorage() {
+    return localStorage.getItem('token')
+  }
+
+  // useEffect untuk mengecek status login saat komponen pertama kali dirender
+  useEffect(() => {
+    const token = getTokenLocalStorage()
+    if (token) {
+      // Jika token ditemukan, arahkan pengguna ke halaman users
+      navigate('/users')
+    }
+  }, [navigate]) // Menambahkan `navigate` sebagai dependensi
 
   function handleLogin(e) {
     e.preventDefault()
-    // alert(`Username: ${username}\nPassword: ${password}`)
 
-    // validate username dan password
     if (username === '' || password === '') {
       Swal.fire({
         icon: 'error',
@@ -27,21 +40,15 @@ export default function LoginForm() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-
         username: username,
         password: password,
-        expiresInMins: 30, // optional, defaults to 60
+        expiresInMins: 30,
       })
     })
       .then(res => res.json())
       .then((data) => {
-
-
         if (data.token) {
-          // save token to local storage
           localStorage.setItem('token', data.token)
-
-          // show alert
           Swal.fire({
             icon: 'success',
             title: 'Login Success',
@@ -49,13 +56,9 @@ export default function LoginForm() {
             confirmButtonColor: '#0984e3',
             timer: 1500
           }).then(() => {
-
-            // redirect to home page
-            Navigate('/users')
-
+            navigate('/users')
           })
         } else {
-          // show alert
           Swal.fire({
             icon: 'error',
             title: 'Login Failed',
@@ -65,7 +68,6 @@ export default function LoginForm() {
         }
       });
   }
-
 
   return (
     <form onSubmit={handleLogin} className='border py-6 px-8 rounded-lg shadow-lg space-y-6 bg-white max-w-sm mx-auto'>
@@ -83,16 +85,23 @@ export default function LoginForm() {
         />
       </div>
 
-      <div className='flex flex-col'>
+      <div className='flex flex-col relative'>
         <label htmlFor="password" className='text-gray-600 mb-2'>Password</label>
         <input
           className='py-2 px-4 border border-gray-300 rounded focus:outline-none focus:border-blue-400 transition duration-200 ease-in-out'
-          type="password"
+          type={showPassword ? "text" : "password"}
           id='password'
           placeholder='Enter your password'
           onInput={(e) => setPassword(e.target.value)}
           value={password}
         />
+        <button
+          type="button"
+          className='absolute right-3 h-full mt-3 text-gray-500'
+          onClick={() => setShowPassword(!showPassword)}
+        >
+          {showPassword ? 'Hide' : 'Show'}
+        </button>
       </div>
 
       <button className='w-full py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-200 ease-in-out'>
