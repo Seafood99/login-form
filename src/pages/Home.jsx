@@ -1,9 +1,12 @@
 import React from 'react'
+import LoginForm from '../components/LoginForm'
 
 export default function Home() {
     return (
-        <div className='flex items-center justify-center h-screen'>
-            <h1 className='text-3xl font-bold'>Home</h1>
-        </div>
+        
+        <section className='container max-w-lg py-20'>
+            <LoginForm />
+        </section>
+        
     )
 }
