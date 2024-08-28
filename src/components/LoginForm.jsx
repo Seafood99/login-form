@@ -46,7 +46,7 @@ export default function LoginForm() {
             icon: 'success',
             title: 'Login Success',
             text: 'Welcome back',
-            showConfirmButton: true,
+            confirmButtonColor: '#0984e3',
             timer: 1500
           }).then(() => {
 
